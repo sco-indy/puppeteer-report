@@ -25,7 +25,7 @@ To support headers or footers, Puppeteer Report creates two PDF files. The first
 
 ![image](https://raw.githubusercontent.com/PejmanNik/puppeteer-report/master/.attachment/image1.png)
 
-## How to Install
+## How to Install as a dependency
 
 Using `npm`
 
@@ -37,6 +37,20 @@ or `yarn`
 
 ```
 yarn add puppeteer-report
+```
+
+### How to use a local version during development
+
+To link the dependent project with this lib, run once
+
+```bash
+$ pnpm link /path/to/puppeteer-report/out
+```
+
+To see your changes in the dependent project, run after each change
+
+```bash
+$ npm run build && npm run build-bundle && cp package.json out
 ```
 
 ## Convert To PDF
