@@ -4,7 +4,8 @@ export async function createReport(
   baseDoc: PDFDocument,
   headersPdfBuffer: Uint8Array,
   headerHeight: number,
-  footerHeight: number
+  footerHeight: number,
+  shouldDisplayHeaderOnFirstPage: boolean,
 ) {
   const headerDoc = await PDFDocument.load(headersPdfBuffer);
 
@@ -12,6 +13,8 @@ export async function createReport(
   const headerPages = headerDoc.getPages();
 
   const hasBoth = !!headerHeight && !!footerHeight;
+
+  const hasHeader = !!headerHeight;
 
   // get pages dimensions
   const x = basePages[0].getWidth();
@@ -35,12 +38,21 @@ export async function createReport(
     // have both header and footer and we are in odd pages
     // 1, 3, 5, etc
     if (headerHeight && (!hasBoth || isOdd)) {
-      boxes.push({
-        bottom: y - pdfHeaderHeight,
-        left: 0,
-        right: x,
-        top: y!,
-      });
+      if (i == 1 && hasHeader && !shouldDisplayHeaderOnFirstPage) {
+        boxes.push({
+          bottom: y!,
+          left: 0,
+          right: x,
+          top: y!,
+        });
+      } else {
+        boxes.push({
+          bottom: y - pdfHeaderHeight,
+          left: 0,
+          right: x,
+          top: y!,
+        });
+      }
     }
 
     // have only footer or
@@ -66,12 +78,14 @@ export async function createReport(
     const isOdd = i % 2 != 0;
 
     if (headerHeight && (!hasBoth || isOdd)) {
-      basePages[baseIndex].drawPage(embeddedPage, {
-        ...size,
-        x: x - size.width,
-        y: y - size.height,
-        blendMode: BlendMode.Multiply
-      });
+      if (i !== 1 || shouldDisplayHeaderOnFirstPage) {
+        basePages[baseIndex].drawPage(embeddedPage, {
+          ...size,
+          x: x - size.width,
+          y: y - size.height,
+          blendMode: BlendMode.Multiply
+        });
+      }
     }
 
     if (footerHeight && (!hasBoth || !isOdd)) {

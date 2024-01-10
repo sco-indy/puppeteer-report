@@ -33,6 +33,8 @@ async function pdfPage(page: Page, options?: PDFOptions): Promise<Uint8Array> {
     marginBottom: pdfOptions?.margin?.bottom ?? 0,
   };
 
+  const shouldDisplayHeaderOnFirstPage = pdfOptions.displayHeaderOnFirstPage ?? true;
+
   const [getHeightFunc, getHeightArg] = core.getHeightEvaluator(
     margin.marginTop,
     margin.marginBottom,
@@ -46,7 +48,8 @@ async function pdfPage(page: Page, options?: PDFOptions): Promise<Uint8Array> {
 
   const [basePageEvalFunc, basePageEvalArg] = core.getBaseEvaluator(
     headerHeight,
-    footerHeight
+    footerHeight,
+    shouldDisplayHeaderOnFirstPage,
   );
   await page.evaluate(basePageEvalFunc, basePageEvalArg);
 
@@ -63,7 +66,8 @@ async function pdfPage(page: Page, options?: PDFOptions): Promise<Uint8Array> {
     doc,
     headerPdfBuffer,
     headerHeight,
-    footerHeight
+    footerHeight,
+    shouldDisplayHeaderOnFirstPage,
   );
 
   if (path) {

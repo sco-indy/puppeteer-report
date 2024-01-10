@@ -94,11 +94,11 @@ export function getHeightEvaluator(
 //  ------------
 // |            |
 //      ...
-export function getBaseEvaluator(headerHeight: number, footerHeight: number) {
-  const argument = { headerHeight, footerHeight };
+export function getBaseEvaluator(headerHeight: number, footerHeight: number, shouldDisplayHeaderOnFirstPage: boolean) {
+  const argument = { headerHeight, footerHeight, shouldDisplayHeaderOnFirstPage };
   type ArgumentType = typeof argument;
 
-  const pageFunc = ({ headerHeight, footerHeight }: ArgumentType) => {
+  const pageFunc = ({ headerHeight, footerHeight, shouldDisplayHeaderOnFirstPage }: ArgumentType) => {
     const header = document.getElementById("header");
     const footer = document.getElementById("footer");
 
@@ -116,21 +116,27 @@ export function getBaseEvaluator(headerHeight: number, footerHeight: number) {
     const evaluate = (
       element: HTMLElement | null,
       height: number,
-      isTop: boolean
+      isTop: boolean,
+      shouldDisplayHeaderOnFirstPage: boolean,
     ) => {
       if (element) {
         element.style.display = "none";
 
         if (isTop) {
-          styleSheet.insertRule(`@page { margin-top: ${height}px}`);
+          styleSheet.insertRule(`@page { margin-top: ${height}px }`);
+
+          // Prevent displaying a white block where the header would have been
+          if (!shouldDisplayHeaderOnFirstPage) {
+            styleSheet.insertRule(`@page :first { margin-top: 0px }`);
+          }
         } else {
           styleSheet.insertRule(`@page { margin-bottom: ${height}px}`);
         }
       }
     };
 
-    evaluate(header, headerHeight, true);
-    evaluate(footer, footerHeight, false);
+    evaluate(header, headerHeight, true, shouldDisplayHeaderOnFirstPage);
+    evaluate(footer, footerHeight, false, shouldDisplayHeaderOnFirstPage);
   };
 
   return [pageFunc, argument] as [

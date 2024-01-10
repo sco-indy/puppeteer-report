@@ -1,8 +1,7 @@
 //TODO: puppeteer-core types differ from puppeteer
 // https://github.com/puppeteer/puppeteer/issues/6904
 
-import type { PDFOptions, Awaitable, WaitForOptions} from "puppeteer-core";
-export type { PDFOptions } from "puppeteer-core";
+import type { PDFOptions as PuppeteerPDFOptions, Awaitable, WaitForOptions} from "puppeteer-core";
 
 
 type InnerParams<T extends unknown[]> = {
@@ -27,6 +26,10 @@ export interface Page {
     pageFunction: Func | string,
     ...args: Params
   ): Promise<Awaited<ReturnType<Func>>>;
+}
+
+export type PDFOptions = PuppeteerPDFOptions & {
+  displayHeaderOnFirstPage?: boolean;
 }
 
 export interface Browser {
